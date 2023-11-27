@@ -55,6 +55,13 @@ class Point:
         self.x = (x * math.cos(math.radians(angle)) - y * math.sin(math.radians(angle)))
         self.y = (y * math.cos(math.radians(angle)) + x * math.sin(math.radians(angle)))
     
+    # used for collisions
+    def line_point_get_Y(self, line_p1, line_p2, point_x)
+        # y = k*x + q
+        k = (line_p2.y - line_p1.y) / (line_p2.x - line_p1.x)
+        q = line_p1.y - k * line_p1.x
+        return (k * point_x + q)
+    
 class Rocket:
     position = Point(0, 0)
     image = ""
@@ -67,6 +74,8 @@ class Rocket:
 
         for i in self.def_points:
             self.col_points.append(Point(i.x + self.position.x, i.y + self.position.y))
+        
+        self.is_coliding = False
 
     def movex(self, plusx):
         self.position.x += plusx
@@ -79,7 +88,7 @@ class Rocket:
             i.y += plusy
         
     def rotate(self, angle):
-        # TODO fix deform
+        # do not use the col_points for this, it will slowly deform
         self.angle = (self.angle + angle) % 360
 
         # https://en.wikipedia.org/wiki/Rotation_matrix
@@ -99,8 +108,19 @@ class Rocket:
 
     def col_check_l():
         # TODO
+        self.is_coliding = False
+
         # loop through land points 
-        pass
+        for i in self.col_points:
+            closest_left_index = 0
+            for j in range(len(Land.land)):
+                #TODO
+                #Land.land[j].x < i.x
+
+            #TODO
+
+            if (closest_left_index > 0):
+                self.is_coliding = True
 
     def returnl(self):
         return self.position.returnl()
@@ -194,7 +214,6 @@ while running:
 
     # DO NOT DELETE THE CIRCLE, it is for reference in case the rocket gets broken it is easier to notice
     # also will be used as a collision indicator for testing purposes
-    rocket.is_coliding = True
     if rocket.is_coliding:
         pygame.draw.circle(screen, Colors.red1, rocket.returnl(), 50, 4)
     else:
