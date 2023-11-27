@@ -8,9 +8,13 @@ import copy
 class Game_var:
     w = 600
     h = 600
-    land_limit_h = 400 # from top
+    land_height_max = 400 # from top
+    land_height_min = 550 # from top
     gravity = .5
     landres = 30 #ammount of land points
+
+    keypress_move_distance = 2 
+    keypress_angle = 2 #in degrees
 
 class Colors:
     background = (15, 15, 60)
@@ -81,14 +85,9 @@ class Rocket:
         # https://en.wikipedia.org/wiki/Rotation_matrix
         temp = copy.deepcopy(self.def_points) # deepcopy necessary
 
-        for i in self.def_points:
-            print(i.returnl())
-        print(angle)
-
         points = list()
         for i in temp:
             i.rotate_vector(self.angle)
-            print(i.returnl())
             points.append(Point(i.x + self.position.x, i.y + self.position.y))
 
         self.col_points = list(points)
@@ -121,23 +120,23 @@ class Land:
 
     def generate(self):
         self.land.clear()
-        self.land.append(Point(0, random.randint(Game_var.land_limit_h, Game_var.h))) #first point
+        self.land.append(Point(0, random.randint(Game_var.land_height_max, Game_var.land_height_min))) #first point
         for i in range(Game_var.landres):
-            self.land.append(Point(int(Game_var.w / (Game_var.landres+1)) * (i+1), random.randint(Game_var.land_limit_h, Game_var.h)))
-        self.land.append(Point(Game_var.w, random.randint(Game_var.land_limit_h, Game_var.h))) #last point
+            self.land.append(Point(int(Game_var.w / (Game_var.landres+1)) * (i+1), random.randint(Game_var.land_height_max, Game_var.land_height_min)))
+        self.land.append(Point(Game_var.w, random.randint(Game_var.land_height_max, Game_var.land_height_min))) #last point
         # bottom corners
         self.land.append(Point(Game_var.w, Game_var.h))
         self.land.append(Point(0, Game_var.h))
 
         # landing place
-        place_point_i_2 = random.randint(1, len(self.land))
+        lp1 = random.randint(0, (Game_var.landres))
+        self.land[lp1 + 1].y = self.land[lp1].y
+
 
         # load into second list, which uses no Points
         for i in self.land:
             self.land_print.append(i.returnl())
-        print(len(self.land))
 
-            
     def draw(self):
         pygame.draw.polygon(screen, Colors.grey, self.land_print)
 
@@ -175,18 +174,18 @@ while running:
     # Controls
     #TODO manage key release, acceleration support, gravity
     if pygame.key.get_pressed()[pygame.K_w]:
-        rocket.movey(-2)
+        rocket.movey(-Game_var.keypress_move_distance)
     if pygame.key.get_pressed()[pygame.K_s]:
-        rocket.movey(2)
+        rocket.movey(Game_var.keypress_move_distance)
     if pygame.key.get_pressed()[pygame.K_a]:
-        rocket.movex(-2)
+        rocket.movex(-Game_var.keypress_move_distance)
     if pygame.key.get_pressed()[pygame.K_d]:
-        rocket.movex(2)
+        rocket.movex(Game_var.keypress_move_distance)
 
     if pygame.key.get_pressed()[pygame.K_h]:
-        rocket.rotate(-2)
+        rocket.rotate(-Game_var.keypress_angle)
     if pygame.key.get_pressed()[pygame.K_l]:
-        rocket.rotate(2)
+        rocket.rotate(Game_var.keypress_angle)
 
 
     screen.fill(Colors.background)
@@ -204,6 +203,9 @@ while running:
     rocket.draw()
     
     pygame.display.flip()
+
+    #fps limit, should be fine
+    pygame.time.Clock().tick(60)
 
 # Quit
 pygame.quit()
