@@ -56,11 +56,11 @@ class Point:
         self.y = (y * math.cos(math.radians(angle)) + x * math.sin(math.radians(angle)))
     
     # used for collisions
-    def line_point_get_Y(self, line_p1, line_p2, point_x)
+    def line_point_get_Y(self, line_p1, line_p2):
         # y = k*x + q
         k = (line_p2.y - line_p1.y) / (line_p2.x - line_p1.x)
         q = line_p1.y - k * line_p1.x
-        return (k * point_x + q)
+        return (k * self.x + q)
     
 class Rocket:
     position = Point(0, 0)
@@ -106,20 +106,20 @@ class Rocket:
         # use movex and movey to simplify, move based on angle
         pass
 
-    def col_check_l():
+    def col_check_l(self, land):
         # TODO
         self.is_coliding = False
 
         # loop through land points 
         for i in self.col_points:
             closest_left_index = 0
-            for j in range(len(Land.land)):
+            for j in range(len(land.land)):
                 #TODO
-                #Land.land[j].x < i.x
+                if land.land[j].x < i.x:
+                    closest_left_index = j
 
-            #TODO
 
-            if (closest_left_index > 0):
+            if (i.line_point_get_Y(land.land[closest_left_index - 1], land.land[closest_left_index]) - i.y < 0):
                 self.is_coliding = True
 
     def returnl(self):
@@ -214,6 +214,7 @@ while running:
 
     # DO NOT DELETE THE CIRCLE, it is for reference in case the rocket gets broken it is easier to notice
     # also will be used as a collision indicator for testing purposes
+    rocket.col_check_l(l1)
     if rocket.is_coliding:
         pygame.draw.circle(screen, Colors.red1, rocket.returnl(), 50, 4)
     else:
