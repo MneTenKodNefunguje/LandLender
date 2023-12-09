@@ -23,10 +23,6 @@ class Colors:
     grey = (110, 100, 130)
     gray_r = (150, 230, 80)
 
-# Init
-pygame.init()
-pygame.display.set_caption("Lunar Lander")
-screen = pygame.display.set_mode([Game_var.w, Game_var.h])
 
 # Classes
 class Point:
@@ -64,7 +60,7 @@ class Point:
     
 class Rocket:
     position = Point(0, 0)
-    image = ""
+    #image = ""
     def_points =  [Point(0, -20), Point(15, -5), Point(20, 25), Point(-20, 25), Point(-15, -5)] #defined at angle 0, relative to the center of rotation defined by x and y
     col_points = list()
 
@@ -106,20 +102,21 @@ class Rocket:
         # use movex and movey to simplify, move based on angle
         pass
 
-    def col_check_l(self, land):
-        # TODO
+    def col_check(self, land):
         self.is_coliding = False
 
         # loop through land points 
         for i in self.col_points:
-            closest_left_index = 0
-            for j in range(len(land.land)):
-                #TODO
-                if land.land[j].x < i.x:
-                    closest_left_index = j
+            closest_index = 0
+            for j in range(len(land.land) - 2): # -2 is removing polugon points unneccessary for calculations
+                #print(i.x, " ", land.land[j].x)
+                                                # they also break it
+                if (float(i.x) > land.land[j].x):
+                    closest_index += 1
 
+                print(closest_index)
 
-            if (i.line_point_get_Y(land.land[closest_left_index - 1], land.land[closest_left_index]) - i.y < 0):
+            if (i.y > i.line_point_get_Y(land.land[closest_index], land.land[closest_index - 1])):
                 self.is_coliding = True
 
     def returnl(self):
@@ -170,6 +167,10 @@ class Background:
 
 ###########################
 
+# Init
+pygame.init()
+pygame.display.set_caption("Lunar Lander")
+screen = pygame.display.set_mode([Game_var.w, Game_var.h])
 l1 = Land()
 l1.generate()
 
@@ -214,7 +215,7 @@ while running:
 
     # DO NOT DELETE THE CIRCLE, it is for reference in case the rocket gets broken it is easier to notice
     # also will be used as a collision indicator for testing purposes
-    rocket.col_check_l(l1)
+    rocket.col_check(l1)
     if rocket.is_coliding:
         pygame.draw.circle(screen, Colors.red1, rocket.returnl(), 50, 4)
     else:
